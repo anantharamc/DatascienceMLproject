@@ -16,11 +16,11 @@ Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave 
 * The CSV file was read using read.csv, and it had 19622 observations and 160 features. Summary of features have shown many "NA" values and strings #DIV/0!, which you typically see in Excel spreadsheets. The data was again read by specifying na.strings. (See [Figure 1](#f1))
 * The resulting data frame had more than 100 columns with 19000 or more NA values. These columns were dropped from the dataset.
 * The dropped columns are,
-** kurtosis\_roll\_belt through var\_yaw\_belt 
-** var\_accel\_arm through var\_yaw\_arm 
-** kurtosis\_roll\_arm through amplitude\_yaw\_arm 
-** kurtosis\_roll\_dumbell through var\_yaw\_dumbell 
-** kurtosis\_roll\_forearm through var\_yaw\_forearm 
+** *kurtosis_roll_belt through var_yaw_belt*
+** *var_accel_arm through var_yaw_arm*
+** *kurtosis_roll_arm through amplitude_yaw_arm*
+** *kurtosis_roll_dumbell through var_yaw_dumbell* 
+** *kurtosis_roll_forearm through var_yaw_forearm* 
 
 * Next, I have removed identifier and date/time columns that will not help model building. They are located in columns 1 thru 7.
 * The data frame now has 50 features and one predictor variable, and 19622 observations (See [Figure 2](#f2)) and (See [Figure 3](#f3))
@@ -30,7 +30,10 @@ Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave 
 
 Since this is a classification problem, I have chosen to compare Random Forest, GBM, and Linear Discriminant Analysis with cross validation performed by caret package. In each of the model parameters, I have chosen to set traincontrol values. 
 
+I would expect the out of sample accuracy to be _lower than 0.9599_ obtained using RF.
+
 ### Conclusions
+
 
 
 ## Appendix
@@ -45,7 +48,7 @@ library(ggplot2)
 ```
 <a name="f1"/>
 __Figure 1__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 setwd("c:/users/anchad/Documents")
 data <- read.csv("pml-training.csv", na.strings=c("NA", "#DIV/0!"))
 ```
@@ -53,7 +56,7 @@ data <- read.csv("pml-training.csv", na.strings=c("NA", "#DIV/0!"))
 <a name="f2"/>
 __Figure 2__:  
 
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 # create training, testing, and validation datasets 
 # training = 15%, testing = 15%, and validation = 70%
 
@@ -71,7 +74,7 @@ dim(testing)
 
 <a name="f3"/>
 __Figure 3__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 # Data cleaning
 # Remove columns containing NA
 training <- training[,-(12:36)]
@@ -97,7 +100,7 @@ dim(testing)
 
 <a name="f4"/>
 __Figure 4__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 # Example exploratory analysis
 qplot(classe, training[,5], data=training, color=classe, geom=c("boxplot", "jitter"))
 
@@ -105,7 +108,7 @@ qplot(classe, training[,5], data=training, color=classe, geom=c("boxplot", "jitt
 
 <a name="f5"/>
 __Figure 5__: 
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 fitControl <- trainControl(## 10-fold CV
                            method = "repeatedcv",
                            number = 10,
@@ -120,7 +123,7 @@ confusionMatrix(testing$classe, predict(rfFit,testing))
 
 <a name="f6"/>
 __Figure 6__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 gbFit <- train(classe ~ ., data = training, method = "gbm", trControl = fitControl, verbose = FALSE)
 gbFit
 
@@ -129,7 +132,7 @@ confusionMatrix(testing$classe, predict(gbFit,testing))
 
 <a name="f7"/>
 __Figure 7__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 ldFit <- train(classe ~ ., data = training, method = "lda", trControl = trainControl(method="cv"))
 ldFit
 
@@ -138,7 +141,7 @@ confusionMatrix(testing$classe, predict(ldFit,testing))
 
 <a name="f8"/>
 __Figure 8__:
-```{r, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE}
 # Out of sample error with Validation dataset
 validation <- validation[,-(12:36)]
 validation <- validation[,-(25:34)]
