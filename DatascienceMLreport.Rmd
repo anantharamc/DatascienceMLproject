@@ -1,0 +1,158 @@
+---
+title: "Modeling and analysis of WLE dataset"
+author: "Anantha R. Chadalavada"
+date: "Sunday, June 21, 2015"
+output: html_document
+fontsize: 10pt
+---
+
+### Executive Summary
+This report is produced as part of Practical Machine Learning course (Data Science Specialization), offered by Coursera.org. I analyze and build predictive models of Weight Lifting Exercise dataset provided by http://groupware.les.inf.puc-rio.br/har. The dataset contains measurements of weight lifting activity performed. The goal of this project is to predict the manner in which they did exercise, as rerpesented by the variable "classe".
+
+Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave highest accuracy and kappa statistic of 0.9599 and 0.9492 respectively. I have used this model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.
+
+### Getting and Cleaning Data
+
+* The CSV file was read using read.csv, and it had 19622 observations and 160 features. Summary of features have shown many "NA" values and strings #DIV/0!, which you typically see in Excel spreadsheets. The data was again read by specifying na.strings. (See [Figure 1](#f1))
+* The resulting data frame had more than 100 columns with 19000 or more NA values. These columns were dropped from the dataset.
+* The dropped columns are,
+** kurtosis\_roll\_belt through var\_yaw\_belt 
+** var\_accel\_arm through var\_yaw\_arm 
+** kurtosis\_roll\_arm through amplitude\_yaw\_arm 
+** kurtosis\_roll\_dumbell through var\_yaw\_dumbell 
+** kurtosis\_roll\_forearm through var\_yaw\_forearm 
+
+* Next, I have removed identifier and date/time columns that will not help model building. They are located in columns 1 thru 7.
+* The data frame now has 50 features and one predictor variable, and 19622 observations (See [Figure 2](#f2)) and (See [Figure 3](#f3))
+* Then I performed basic exploratory analysis with qplot, and example of which is shown in (See [Figure 4](#f4))
+
+### Model selection
+
+Since this is a classification problem, I have chosen to compare Random Forest, GBM, and Linear Discriminant Analysis with cross validation performed by caret package. In each of the model parameters, I have chosen to set traincontrol values. 
+
+### Conclusions
+
+
+## Appendix
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(randomForest)
+library(gbm)
+library(MASS)
+library(e1071)
+library(caret)
+library(ggplot2)
+```
+<a name="f1"/>
+__Figure 1__:
+```{r, warning=FALSE, cache=TRUE}
+setwd("c:/users/anchad/Documents")
+data <- read.csv("pml-training.csv", na.strings=c("NA", "#DIV/0!"))
+```
+
+<a name="f2"/>
+__Figure 2__:  
+
+```{r, warning=FALSE, cache=TRUE}
+# create training, testing, and validation datasets 
+# training = 15%, testing = 15%, and validation = 70%
+
+inTrain <- createDataPartition(data$classe, p=0.30, list=FALSE)
+trainandtest <- data[inTrain,]
+validation <- data[-inTrain,]
+dim(trainandtest)
+
+inTrain <- createDataPartition(trainandtest$classe, p=0.50, list=FALSE)
+training <- trainandtest[inTrain,]
+testing <- trainandtest[-inTrain,]
+dim(training)
+dim(testing)
+```
+
+<a name="f3"/>
+__Figure 3__:
+```{r, warning=FALSE, cache=TRUE}
+# Data cleaning
+# Remove columns containing NA
+training <- training[,-(12:36)]
+training <- training[,-(25:34)]
+training <- training[,-(34:48)]
+training <- training[,-(37:62)]
+training <- training[,-(49:74)]
+
+testing <- testing[,-(12:36)]
+testing <- testing[,-(25:34)]
+testing <- testing[,-(34:48)]
+testing <- testing[,-(37:62)]
+testing <- testing[,-(49:74)]
+
+# Remove identifier and date time columns that are not suitable for modeling
+training <- training[,-(1:7)]
+testing <- testing[,-(1:7)]
+
+dim(training)
+dim(testing)
+
+```
+
+<a name="f4"/>
+__Figure 4__:
+```{r, warning=FALSE, cache=TRUE}
+# Example exploratory analysis
+qplot(classe, training[,5], data=training, color=classe, geom=c("boxplot", "jitter"))
+
+```
+
+<a name="f5"/>
+__Figure 5__: 
+```{r, warning=FALSE, cache=TRUE}
+fitControl <- trainControl(## 10-fold CV
+                           method = "repeatedcv",
+                           number = 10,
+                           ## repeated ten times
+                           repeats = 10)
+
+rfFit <- train(classe ~ ., data = training, method = "rf", trControl = fitControl, verbose = FALSE)
+rfFit
+
+confusionMatrix(testing$classe, predict(rfFit,testing))
+```
+
+<a name="f6"/>
+__Figure 6__:
+```{r, warning=FALSE, cache=TRUE}
+gbFit <- train(classe ~ ., data = training, method = "gbm", trControl = fitControl, verbose = FALSE)
+gbFit
+
+confusionMatrix(testing$classe, predict(gbFit,testing))
+```
+
+<a name="f7"/>
+__Figure 7__:
+```{r, warning=FALSE, cache=TRUE}
+ldFit <- train(classe ~ ., data = training, method = "lda", trControl = trainControl(method="cv"))
+ldFit
+
+confusionMatrix(testing$classe, predict(ldFit,testing))
+```
+
+<a name="f8"/>
+__Figure 8__:
+```{r, warning=FALSE, cache=TRUE}
+# Out of sample error with Validation dataset
+validation <- validation[,-(12:36)]
+validation <- validation[,-(25:34)]
+validation <- validation[,-(34:48)]
+validation <- validation[,-(37:62)]
+validation <- validation[,-(49:74)]
+validation <- validation[,-(1:7)]
+
+# OOS error for RF
+confusionMatrix(validation$classe, predict(rfFit,validation))
+
+# OOS error for GBM
+confusionMatrix(validation$classe, predict(gbFit,validation))
+
+# OOS error for LDA
+confusionMatrix(validation$classe, predict(ldFit,validation))
+```
