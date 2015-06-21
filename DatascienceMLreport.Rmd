@@ -9,7 +9,7 @@ fontsize: 10pt
 ### Executive Summary
 This report is produced as part of Practical Machine Learning course (Data Science Specialization), offered by Coursera.org. I analyze and build predictive models of Weight Lifting Exercise dataset provided by http://groupware.les.inf.puc-rio.br/har. The dataset contains measurements of weight lifting activity performed. The goal of this project is to predict the manner in which they did exercise, as rerpesented by the variable "classe".
 
-Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave highest accuracy and kappa statistic compared to GBM and Linear Discriminant analysis. I have used RF model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.
+Based on my analysis and modeling Random Forest with CV gave highest accuracy and kappa statistic compared to GBM and Linear Discriminant analysis. I have used RF model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.
 
 ### Getting and Cleaning Data
 
@@ -30,7 +30,8 @@ Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave 
 ** *kurtosis_roll_forearm through var_yaw_forearm*   
 
 
-* Next, I have removed identifier and date/time columns that will not help model building. They are located in columns 1 thru 7.
+* Next, I have removed identifier and date/time columns that will not help with model building. They are located in columns 1 thru 7.  
+
 * The data frame now has 50 features and one predictor variable, and 19622 observations (See [Figure 2](#f2)) and (See [Figure 3](#f3))  
 
 * Then I performed basic exploratory analysis with qplot, and example of which is shown in (See [Figure 4](#f4))

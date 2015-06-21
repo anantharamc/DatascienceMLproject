@@ -61,7 +61,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="executive-summary" class="section level3">
 <h3>Executive Summary</h3>
 <p>This report is produced as part of Practical Machine Learning course (Data Science Specialization), offered by Coursera.org. I analyze and build predictive models of Weight Lifting Exercise dataset provided by <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>. The dataset contains measurements of weight lifting activity performed. The goal of this project is to predict the manner in which they did exercise, as rerpesented by the variable “classe”.</p>
-<p>Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave highest accuracy and kappa statistic compared to GBM and Linear Discriminant analysis. I have used RF model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.</p>
+<p>Based on my analysis and modeling Random Forest with CV gave highest accuracy and kappa statistic compared to GBM and Linear Discriminant analysis. I have used RF model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.</p>
 </div>
 <div id="getting-and-cleaning-data" class="section level3">
 <h3>Getting and Cleaning Data</h3>
@@ -76,7 +76,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>** <em>kurtosis_roll_dumbell through var_yaw_dumbell</em></p>
 <p>** <em>kurtosis_roll_forearm through var_yaw_forearm</em></p>
 <ul>
-<li>Next, I have removed identifier and date/time columns that will not help model building. They are located in columns 1 thru 7.</li>
+<li><p>Next, I have removed identifier and date/time columns that will not help with model building. They are located in columns 1 thru 7.</p></li>
 <li><p>The data frame now has 50 features and one predictor variable, and 19622 observations (See <a href="#f2">Figure 2</a>) and (See <a href="#f3">Figure 3</a>)</p></li>
 <li><p>Then I performed basic exploratory analysis with qplot, and example of which is shown in (See <a href="#f4">Figure 4</a>)</p></li>
 </ul>
@@ -167,10 +167,10 @@ rfFit</code></pre>
 ## 
 ## Resampling results across tuning parameters:
 ## 
-##   mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
-##    2    0.9558740  0.9441577  0.010993401  0.013962116
-##   26    0.9538344  0.9415680  0.009175524  0.011648001
-##   50    0.9375378  0.9209671  0.005351549  0.006816498
+##   mtry  Accuracy   Kappa      Accuracy SD  Kappa SD  
+##    2    0.9552007  0.9433110  0.009614778  0.01219898
+##   26    0.9524738  0.9398439  0.011408559  0.01448441
+##   50    0.9361790  0.9192542  0.008585523  0.01089943
 ## 
 ## Accuracy was used to select the optimal model using  the largest value.
 ## The final value used for the model was mtry = 2.</code></pre>
@@ -224,25 +224,25 @@ rfFit</code></pre>
 ## Resampling results across tuning parameters:
 ## 
 ##   interaction.depth  n.trees  Accuracy   Kappa      Accuracy SD
-##   1                   50      0.7461297  0.6781098  0.03391554 
-##   1                  100      0.8112985  0.7612053  0.02766896 
-##   1                  150      0.8415129  0.7994359  0.03433567 
-##   2                   50      0.8421748  0.8001594  0.01986838 
-##   2                  100      0.8903743  0.8612985  0.01535875 
-##   2                  150      0.9097188  0.8858514  0.01273247 
-##   3                   50      0.8808712  0.8492140  0.01697926 
-##   3                  100      0.9202422  0.8990824  0.01863021 
-##   3                  150      0.9368720  0.9201322  0.01225847 
+##   1                   50      0.7413747  0.6721486  0.03511433 
+##   1                  100      0.8062028  0.7546266  0.02532714 
+##   1                  150      0.8418421  0.7998524  0.02391652 
+##   2                   50      0.8343718  0.7904181  0.02210265 
+##   2                  100      0.8876636  0.8578324  0.01971548 
+##   2                  150      0.9127754  0.8896628  0.01444028 
+##   3                   50      0.8808666  0.8492542  0.01188899 
+##   3                  100      0.9229529  0.9025013  0.01122903 
+##   3                  150      0.9334833  0.9158205  0.01612730 
 ##   Kappa SD  
-##   0.04306911
-##   0.03490925
-##   0.04344483
-##   0.02497960
-##   0.01934522
-##   0.01603395
-##   0.02145985
-##   0.02359127
-##   0.01552672
+##   0.04450102
+##   0.03199598
+##   0.03012430
+##   0.02783603
+##   0.02491445
+##   0.01822003
+##   0.01501997
+##   0.01418587
+##   0.02044582
 ## 
 ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
 ## 
