@@ -9,48 +9,64 @@ fontsize: 10pt
 ### Executive Summary
 This report is produced as part of Practical Machine Learning course (Data Science Specialization), offered by Coursera.org. I analyze and build predictive models of Weight Lifting Exercise dataset provided by http://groupware.les.inf.puc-rio.br/har. The dataset contains measurements of weight lifting activity performed. The goal of this project is to predict the manner in which they did exercise, as rerpesented by the variable "classe".
 
-Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave highest accuracy and kappa statistic of 0.9599 and 0.9492 respectively. I have used this model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.
+Based on my analysis and modeling Random Forest with repeated CV (10-fold) gave highest accuracy and kappa statistic compared to GBM and Linear Discriminant analysis. I have used RF model to predict the values of test data in pml-testing.csv, and I have correctly identified all 20 classes.
 
 ### Getting and Cleaning Data
 
-* The CSV file was read using read.csv, and it had 19622 observations and 160 features. Summary of features have shown many "NA" values and strings #DIV/0!, which you typically see in Excel spreadsheets. The data was again read by specifying na.strings. (See [Figure 1](#f1))
-* The resulting data frame had more than 100 columns with 19000 or more NA values. These columns were dropped from the dataset.
-* The dropped columns are,
-** *kurtosis_roll_belt through var_yaw_belt*
-** *var_accel_arm through var_yaw_arm*
-** *kurtosis_roll_arm through amplitude_yaw_arm*
-** *kurtosis_roll_dumbell through var_yaw_dumbell* 
-** *kurtosis_roll_forearm through var_yaw_forearm* 
+* The CSV file was read using read.csv, and it had 19622 observations and 160 features. Summary of features have shown many "NA" values and strings #DIV/0!, which you typically see in Excel spreadsheets. The data was again read by specifying na.strings. (See [Figure 1](#f1))  
+
+* The resulting data frame had more than 100 columns with 19000 or more NA values. These columns were dropped from the dataset.  
+
+* The dropped columns are,  
+
+** *kurtosis_roll_belt through var_yaw_belt*  
+
+** *var_accel_arm through var_yaw_arm*  
+
+** *kurtosis_roll_arm through amplitude_yaw_arm*  
+
+** *kurtosis_roll_dumbell through var_yaw_dumbell*   
+
+** *kurtosis_roll_forearm through var_yaw_forearm*   
+
 
 * Next, I have removed identifier and date/time columns that will not help model building. They are located in columns 1 thru 7.
-* The data frame now has 50 features and one predictor variable, and 19622 observations (See [Figure 2](#f2)) and (See [Figure 3](#f3))
+* The data frame now has 50 features and one predictor variable, and 19622 observations (See [Figure 2](#f2)) and (See [Figure 3](#f3))  
+
 * Then I performed basic exploratory analysis with qplot, and example of which is shown in (See [Figure 4](#f4))
 
 ### Model selection
 
-Since this is a classification problem, I have chosen to compare Random Forest, GBM, and Linear Discriminant Analysis with cross validation performed by caret package. In each of the model parameters, I have chosen to set traincontrol values. 
+Since this is a classification problem, I have chosen to compare Random Forest (See [Figure 5](#f5)), GBM (See [Figure 6](#f6)), and Linear Discriminant Analysis (See [Figure 7](#f7)) with cross validation performed by caret package. In each of the model parameters, I have chosen to set traincontrol values. 
 
-I would expect the out of sample accuracy to be _lower than 0.9599_ obtained using RF.
+I would expect the out of sample accuracy to be lower than obtained using RF on the training set.
 
 ### Conclusions
+
+In conclusion, modeling with LDA performed worse than RF and GBM (See [Figure 8](#f8)). Although, accuracy of RF and GBM are close, consistently RF produced higher accuracy and kappa statistic than GBM. Similar higher accuracy for RF compared to GBM is also noticed on the out-of-sample "validation"" dataset, that was set aside in the beginning.
 
 
 
 ## Appendix
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(randomForest)
 library(gbm)
 library(MASS)
 library(e1071)
 library(caret)
 library(ggplot2)
+library(doParallel)
 ```
 <a name="f1"/>
 __Figure 1__:
 ```{r, warning=FALSE}
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+
 setwd("c:/users/anchad/Documents")
 data <- read.csv("pml-training.csv", na.strings=c("NA", "#DIV/0!"))
+set.seed(1231)
 ```
 
 <a name="f2"/>
@@ -109,11 +125,7 @@ qplot(classe, training[,5], data=training, color=classe, geom=c("boxplot", "jitt
 <a name="f5"/>
 __Figure 5__: 
 ```{r, warning=FALSE}
-fitControl <- trainControl(## 10-fold CV
-                           method = "repeatedcv",
-                           number = 10,
-                           ## repeated ten times
-                           repeats = 10)
+fitControl <- trainControl(method = "cv", number=5)
 
 rfFit <- train(classe ~ ., data = training, method = "rf", trControl = fitControl, verbose = FALSE)
 rfFit
@@ -158,4 +170,6 @@ confusionMatrix(validation$classe, predict(gbFit,validation))
 
 # OOS error for LDA
 confusionMatrix(validation$classe, predict(ldFit,validation))
+
+stopCluster(cl)
 ```
